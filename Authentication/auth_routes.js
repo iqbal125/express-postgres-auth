@@ -16,13 +16,17 @@ const router = express.Router()
 
 router.get('/private', requireAuth, (req, res) => {
     res.send('Accessed Private Endpoint')
-  }) 
+}) 
 
 router.post('/login',
   (req, res, next) => {
       localSignIn(req, res)
 })
 
+/*
+JWT is sessionless, so logout only needs to be implemented
+client side. 
+*/
 
 router.post('/signup', (req, res, next ) => {
     let password = req.body.password
@@ -84,7 +88,7 @@ router.post('/signup', (req, res, next ) => {
         //check if user exists
         db.query(query1, values1, callback1)
     })
-  })
+})
 
   
 router.post('/forgot', (req, res) => {
@@ -153,7 +157,7 @@ router.post('/forgot', (req, res) => {
     }
     //find user in db
     db.query(query1, values1, callback1)
-  })
+})
   
   
 router.post('/password_reset', (req, res) => {
@@ -223,6 +227,6 @@ router.post('/password_reset', (req, res) => {
       db.query(query1, values1, callback1)
       })
     .catch(err => console.log(err))
-  }) 
+}) 
 
-  module.exports = router
+module.exports = router
