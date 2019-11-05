@@ -36,6 +36,7 @@ passport.use(new JWTStrategy({
     secretOrKey   : 'secret'
     },
   (jwtPayload, cb) => {
+    //check if id exists in database
         return cb(null, jwtPayload)
     }
 ));
