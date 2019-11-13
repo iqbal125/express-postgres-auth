@@ -1,1 +1,1 @@
-complete authentication using postgres node, express, passport and more. 
+complete authentication using postgres, node, express, passport and more. 
