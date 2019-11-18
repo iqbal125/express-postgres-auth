@@ -251,9 +251,7 @@ router.post('/forgot', (req, res) => {
         })
         .catch(err => console.log(err));
     } else {
-      /*for security purposes you should not display this 
-      message client side */
-      console.log('Email Not Found');
+      res.send('Email Not Found');
     }
     if (q_err) {
       console.log(q_err);
