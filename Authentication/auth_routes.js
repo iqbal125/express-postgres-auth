@@ -297,6 +297,7 @@ router.post('/password_reset', (req, res) => {
          hash is generated before executing 
       */
 
+<<<<<<< HEAD
     let values2 = [email, password_hash, '', ''];
 
     //make sure token hasnt expired
@@ -313,6 +314,28 @@ router.post('/password_reset', (req, res) => {
           db.query(query2, values2, callback2);
         } else {
           res.send('Token Expired');
+=======
+      let values2 = [email, password_hash, '', ''];
+
+      //make sure token hasnt expired
+      //then save new user password to db
+      //set token and reset time in db to empty strings
+      callback1 = (q_err, q_res) => {
+        if (q_res.rows[0]) {
+          let format = 'MM-DD-YYYY HH:mm';
+          let now = moment().format(format);
+          let expiresAt = q_res.rows[0].resettokentime;
+
+          if (moment(expiresAt, format).isAfter(now)) {
+            //save new password to db
+            db.query(query2, values2, callback2);
+          } else {
+            res.send('Token Expired');
+          }
+        }
+        if (!q_res.rows[0]) {
+          res.send('Email not Found or Invalid Token');
+>>>>>>> 8237d8407e92a09ff826e8904935261c89b25cd2
         }
       }
       if (!q_res.rows[0]) {
