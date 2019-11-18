@@ -266,6 +266,8 @@ router.post('/password_reset', (req, res) => {
   let new_password = req.body.password;
   let token = req.body.token;
 
+  console.log(email, new_password, token);
+
   //check if user and resettoken exists
   query1 = `SELECT * 
             FROM users 
@@ -288,41 +290,39 @@ router.post('/password_reset', (req, res) => {
   };
 
   //hash password and put to db
-  hashPassword(new_password)
-    .then(password_hash => {
-      /* values2 and callback1 have to be scoped 
+  hashPassword(new_password).then(password_hash => {
+    /* values2 and callback1 have to be scoped 
          here inside the .then() call because 
          they have to wait until the password 
          hash is generated before executing 
       */
 
-      let values2 = [email, password_hash, '', ''];
+    let values2 = [email, password_hash, '', ''];
 
-      //make sure token hasnt expired
-      //then save new user password to db
-      //set token and reset time in db to empty strings
-      callback1 = (q_err, q_res) => {
-        if (q_res.rows[0]) {
-          let format = 'MM-DD-YYYY HH:mm';
-          let now = moment().format(format);
-          let expiresAt = q_res.rows[0].resettokentime;
+    //make sure token hasnt expired
+    //then save new user password to db
+    //set token and reset time in db to empty strings
+    callback1 = (q_err, q_res) => {
+      if (q_res.rows[0]) {
+        let format = 'MM-DD-YYYY HH:mm';
+        let now = moment(new Date.now()).format(format);
+        let expiresAt = q_res.rows[0].resettokentime;
 
-          if (moment(expiresAt, format).isAfter(now)) {
-            //save new password to db
-            db.query(query2, values2, callback2);
-          } else {
-            res.send('Token Expired');
-          }
+        if (moment(expiresAt, format).isAfter(now)) {
+          //save new password to db
+          db.query(query2, values2, callback2);
+        } else {
+          res.send('Token Expired');
         }
-        if (!q_res.rows[0]) {
-          res.send('Username not Found or Invalid Token');
-        }
-        console.log(q_err);
-      };
-      //check if user exists
-      db.query(query1, values1, callback1);
-    })
-    .catch(err => console.log(err));
+      }
+      if (!q_res.rows[0]) {
+        res.send('Username not Found or Invalid Token');
+      }
+      console.log(q_err);
+    };
+    //check if user exists
+    db.query(query1, values1, callback1);
+  });
 });
 
 module.exports = router;
