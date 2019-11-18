@@ -317,7 +317,7 @@ router.post('/password_reset', (req, res) => {
           }
         }
         if (!q_res.rows[0]) {
-          res.send('Username not Found or Invalid Token');
+          res.send('Email not Found or Invalid Token');
         }
         console.log(q_err);
       };
