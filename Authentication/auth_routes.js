@@ -245,6 +245,8 @@ router.post('/forgot', (req, res) => {
           let values2 = [token, expiresIn, email];
           console.log(values2);
 
+          res.send(token);
+
           //save reset time and token to database
           db.query(query2, values2, callback2);
         })
