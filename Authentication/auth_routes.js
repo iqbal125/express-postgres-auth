@@ -203,16 +203,6 @@ router.post('/forgot', (req, res) => {
 
   let values1 = [email];
 
-  //callback after verifying password reset email sent
-  let callback2 = (q_err, q_res) => {
-    if (q_res) {
-      res.send('Successfully Sent Password reset');
-    }
-    if (q_err) {
-      console.log(q_err);
-    }
-  };
-
   //check if email exists
   let callback1 = (q_err, q_res) => {
     if (q_res.rows[0]) {
@@ -243,12 +233,19 @@ router.post('/forgot', (req, res) => {
           let expiresIn = moment(milli).format('MM-DD-YYYY HH:mm');
 
           let values2 = [token, expiresIn, email];
-          console.log(values2);
 
-          res.send(token);
+          //res.send(token);
 
           //save reset time and token to database
-          db.query(query2, values2, callback2);
+          db.query(query2, values2, (q_err, q_res) => {
+            console.log(token);
+            if (q_res) {
+              res.send(values2[0]);
+            }
+            if (q_err) {
+              console.log(q_err);
+            }
+          });
         })
         .catch((err) => console.log(err));
     } else {
@@ -266,8 +263,6 @@ router.post('/password_reset', (req, res) => {
   let email = req.body.email;
   let new_password = req.body.password;
   let token = req.body.token;
-
-  console.log(email, new_password, token);
 
   //check if user and resettoken exists
   query1 = `SELECT * 
@@ -290,20 +285,15 @@ router.post('/password_reset', (req, res) => {
     }
   };
 
-  //hash password and put to db
-  hashPassword(new_password).then((password_hash) => {
-    /* values2 and callback1 have to be scoped 
-         here inside the .then() call because 
-         they have to wait until the password 
-         hash is generated before executing 
-      */
+  callback1 = (q_err, q_res) => {
+    //hash password and put to db
+    hashPassword(new_password).then((password_hash) => {
+      let values2 = [email, password_hash, '', ''];
 
-    let values2 = [email, password_hash, '', ''];
+      //make sure token hasnt expired
+      //then save new user password to db
+      //set token and reset time in db to empty strings
 
-    //make sure token hasnt expired
-    //then save new user password to db
-    //set token and reset time in db to empty strings
-    callback1 = (q_err, q_res) => {
       if (q_res.rows[0]) {
         let format = 'MM-DD-YYYY HH:mm';
         let now = moment().format(format);
@@ -319,12 +309,10 @@ router.post('/password_reset', (req, res) => {
       if (!q_res.rows[0]) {
         res.send('Email not Found or Invalid Token');
       }
-    };
-    if (!q_res.rows[0]) {
-      res.send('Username not Found or Invalid Token');
-    }
-    console.log(q_err);
-  });
+      if (q_err) console.log(q_err);
+    });
+  };
+
   //check if user exists
   db.query(query1, values1, callback1);
 });
