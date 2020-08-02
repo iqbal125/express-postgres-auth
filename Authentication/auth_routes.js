@@ -7,7 +7,6 @@ const generateBytes = helpers.generateBytes;
 const hashPassword = helpers.hashPassword;
 const passport = require('passport');
 
-const sgMail = require('@sendgrid/mail');
 const requireAuth = require('./passport_config').requireAuth;
 
 const express = require('express');
@@ -106,7 +105,7 @@ router.post('/autho2signup', (req, res) => {
       res.send({ token: setToken(user) });
     }
     if (q_res.rows.length === 0) {
-      hashPassword(password).then(password_hash => {
+      hashPassword(password).then((password_hash) => {
         /* values2 has to be scoped 
              here inside the .then() call because 
              it has to wait until the password 
@@ -173,7 +172,7 @@ router.post('/signup', (req, res) => {
     if (q_res.rows.length === 0) {
       //if email not found, create user in db
       //create password hash before saving to db
-      hashPassword(password).then(password_hash => {
+      hashPassword(password).then((password_hash) => {
         /* values2 has to be scoped 
              here inside the .then() call because 
              it has to wait until the password 
@@ -219,25 +218,25 @@ router.post('/forgot', (req, res) => {
     if (q_res.rows[0]) {
       //generate reset token
       generateBytes()
-        .then(token => {
+        .then((token) => {
           //setup email
-          const msg = {
-            to: 'test@example.com',
-            from: 'test@example.com',
-            subject: 'Password Reset',
-            text: 'Here is the Password Reset Link, Will expire in 1 hour',
-            html:
-              'Please change password' +
-              'with the following link <br/>' +
-              'http://yourdomain.com/app/passwordreset/' +
-              token
-          };
+          //const msg = {
+          //  to: 'test@example.com',
+          //  from: 'test@example.com',
+          //  subject: 'Password Reset',
+          //  text: 'Here is the Password Reset Link, Will expire in 1 hour',
+          //  html:
+          //    'Please change password' +
+          //    'with the following link <br/>' +
+          //    'http://yourdomain.com/app/passwordreset/' +
+          //    token
+          //};
 
           //send email to user
-          sgMail
-            .send(msg)
-            .then(res => console.log())
-            .catch(err => console.log(err));
+          //sgMail
+          //  .send(msg)
+          //  .then(res => console.log())
+          //  .catch(err => console.log(err));
 
           //set expire time 1 hour from now
           let milli = Date.now() + 3600000;
@@ -249,7 +248,7 @@ router.post('/forgot', (req, res) => {
           //save reset time and token to database
           db.query(query2, values2, callback2);
         })
-        .catch(err => console.log(err));
+        .catch((err) => console.log(err));
     } else {
       res.send('Email Not Found');
     }
@@ -290,7 +289,7 @@ router.post('/password_reset', (req, res) => {
   };
 
   //hash password and put to db
-  hashPassword(new_password).then(password_hash => {
+  hashPassword(new_password).then((password_hash) => {
     /* values2 and callback1 have to be scoped 
          here inside the .then() call because 
          they have to wait until the password 
